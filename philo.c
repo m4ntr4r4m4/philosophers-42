@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:13:41 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/08/31 15:31:58 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/08/31 18:54:09 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,42 @@
 
 void*	ft_create(void *arg)
 {
+	struct timeval tv;
+	struct timeval start;
+    struct timezone tz;
 	t_var *var = arg;
 	int	philo;
+
+	gettimeofday(&tv,&tz);
 	philo = var->i + 1;
 	var->i++;
 	//printf("this is death %d\n", var->death);
 	while (var->death)
 	{
-		printf("philo %d is Thinking\n", philo);
+		gettimeofday(&start,&tz);
+		printf("%ld%d philo %d is Thinking\n", start.tv_sec , (start.tv_usec) / 1000 , philo);
 	
 		//// create eating routine
-		printf("philo %d is eating\n", philo);
-		usleep(var->teat);
+		if (var->forks)
+		{
+			pthread_mutex_lock(&var->mutex);
+			var->forks--;
+			gettimeofday(&start,&tz);
+			printf("%ld%d philo %d is eating\n",start.tv_sec , (start.tv_usec) / 1000 , philo);
+			usleep(var->teat);
+			var->forks++;
+			pthread_mutex_unlock(&var->mutex);
+		}
 		//// create sleeping routine
-		printf("philo %d is sleeping\n", philo);
+		pthread_mutex_lock(&var->mutex);
+		gettimeofday(&start,&tz);
+		printf("%ld%d philo %d is sleeping\n", start.tv_sec , (start.tv_usec) / 1000 , philo);
 		usleep(var->tsleep);
-		return 0;
+		pthread_mutex_unlock(&var->mutex);
 	}
+	gettimeofday(&start,&tz);
+	if(!var->death)
+		printf("%ld%d philo %d died\n",start.tv_sec , (start.tv_usec) / 1000 , philo);
 	return (0);
 }
 
@@ -39,7 +58,7 @@ void	begin(t_var var)
 	pthread_t	*philo;
 	int	i;
 
-	printf("this is nf = %d\n", var.nf);
+	printf("this is number of philos = %d\n\n", var.nf);
 	philo = malloc(sizeof(pthread_t) * var.nf);
 	var.i = 0;
 	i = 0;
