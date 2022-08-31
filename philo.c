@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:13:41 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/08/30 16:33:59 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/08/31 15:31:58 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,21 @@
 void*	ft_create(void *arg)
 {
 	t_var *var = arg;
+	int	philo;
+	philo = var->i + 1;
 	var->i++;
-	printf("this is death %d\n", var->death);
+	//printf("this is death %d\n", var->death);
 	while (var->death)
 	{
-		printf("this is philo  %d\n", var->i);
-		sleep(1);
-		printf("philo %d is eating\n", var->i);
-		sleep(1);
-		printf("philo %d is sleeping\n", var->i);
+		printf("philo %d is Thinking\n", philo);
+	
+		//// create eating routine
+		printf("philo %d is eating\n", philo);
+		usleep(var->teat);
+		//// create sleeping routine
+		printf("philo %d is sleeping\n", philo);
+		usleep(var->tsleep);
+		return 0;
 	}
 	return (0);
 }
@@ -39,14 +45,14 @@ void	begin(t_var var)
 	i = 0;
 	while (i < var.nf)
 	{
-		if (pthread_create(&philo[var.i], NULL, &ft_create, &var) != 0)
+		if (pthread_create(&philo[i], NULL, &ft_create, &var) != 0)
 			return ;
-		i++;	
+		i++;
 	}
 	i = 0;
 	while (i < var.nf)
 	{
-		pthread_join(philo[var.i], NULL);
+		pthread_join(philo[i], NULL);
 		i++;
 	}
 
