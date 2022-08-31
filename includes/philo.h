@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:14:10 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/08/08 20:51:59 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/08/30 16:24:47 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,13 @@
 # define FAILURE	0
 
 typedef struct s_var{
+	int	i;
 	int	nf;
 	int	td;
 	int	teat;
 	int	tsleep;
 	int	nteat;
+	int	death;
 }	t_var;
 
 int		ft_isnumeric(char *str);
