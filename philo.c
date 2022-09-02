@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:13:41 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/08/31 18:54:09 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/09/02 12:37:12 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,42 +14,73 @@
 
 void*	ft_create(void *arg)
 {
-	struct timeval tv;
-	struct timeval start;
-    struct timezone tz;
-	t_var *var = arg;
-	int	philo;
+	struct	timeval start;
+    struct	timezone tz;
+	int		philo;
+	long		lastmeal = 0;
+	long		tdeath = 1;
 
-	gettimeofday(&tv,&tz);
+	t_var *var = arg;
 	philo = var->i + 1;
 	var->i++;
-	//printf("this is death %d\n", var->death);
+	if (var->nf % var->i == 0 )
+		usleep(200 * 1000);
 	while (var->death)
 	{
 		gettimeofday(&start,&tz);
-		printf("%ld%d philo %d is Thinking\n", start.tv_sec , (start.tv_usec) / 1000 , philo);
+		printf("%ld%04d philo %d is Thinking\n", start.tv_sec , (start.tv_usec) / 1000 , philo);
 	
 		//// create eating routine
-		if (var->forks)
+		if ((tdeath - lastmeal) > 0 && var->death)
+		{
+			if (var->forks > 1)
+			{
+				pthread_mutex_lock(&var->mutex);
+				var->forks -= 2;
+				pthread_mutex_unlock(&var->mutex);
+				gettimeofday(&start,&tz);
+				if (var->death)
+					printf("%ld%04d philo %d is eating\n",start.tv_sec , (start.tv_usec) / 1000 , philo);
+				usleep(var->teat);
+				pthread_mutex_lock(&var->mutex);
+				var->forks += 2;
+				pthread_mutex_unlock(&var->mutex);
+				gettimeofday(&start,&tz);
+				lastmeal = (var->teat / 1000) + (start.tv_sec * 1000) + (start.tv_usec / 1000);
+				tdeath = ((var->td) / 1000) + (start.tv_sec * 1000) + (start.tv_usec / 1000);
+				printf("last meal %ld\n\n tdeath %ld\n\n", lastmeal, tdeath);
+			
+		
+	
+		//// create sleeping routine
+				pthread_mutex_lock(&var->mutex);
+				gettimeofday(&start,&tz);
+				if (var->death)
+					printf("%ld%04d philo %d is sleeping\n", start.tv_sec , (start.tv_usec) / 1000 , philo);
+				usleep(var->tsleep);
+				pthread_mutex_unlock(&var->mutex);
+			}
+			else
+			{
+				pthread_mutex_lock(&var->mutex);
+				var->death = 0;
+				pthread_mutex_unlock(&var->mutex);
+
+				gettimeofday(&start,&tz);
+				printf("%ld%04d philo %d died\n",start.tv_sec , (start.tv_usec) / 1000 , philo);
+				exit(0);
+			}
+		}
+		else
 		{
 			pthread_mutex_lock(&var->mutex);
-			var->forks--;
-			gettimeofday(&start,&tz);
-			printf("%ld%d philo %d is eating\n",start.tv_sec , (start.tv_usec) / 1000 , philo);
-			usleep(var->teat);
-			var->forks++;
+			var->death = 0;
 			pthread_mutex_unlock(&var->mutex);
+			gettimeofday(&start,&tz);
+			printf("%ld%04d philo %d died\n",start.tv_sec , (start.tv_usec) / 1000 , philo);
+			exit(0);
 		}
-		//// create sleeping routine
-		pthread_mutex_lock(&var->mutex);
-		gettimeofday(&start,&tz);
-		printf("%ld%d philo %d is sleeping\n", start.tv_sec , (start.tv_usec) / 1000 , philo);
-		usleep(var->tsleep);
-		pthread_mutex_unlock(&var->mutex);
 	}
-	gettimeofday(&start,&tz);
-	if(!var->death)
-		printf("%ld%d philo %d died\n",start.tv_sec , (start.tv_usec) / 1000 , philo);
 	return (0);
 }
 
@@ -62,6 +93,7 @@ void	begin(t_var var)
 	philo = malloc(sizeof(pthread_t) * var.nf);
 	var.i = 0;
 	i = 0;
+	pthread_mutex_init(&var.mutex, NULL);
 	while (i < var.nf)
 	{
 		if (pthread_create(&philo[i], NULL, &ft_create, &var) != 0)
@@ -75,6 +107,7 @@ void	begin(t_var var)
 		i++;
 	}
 
+	pthread_mutex_destroy(&var.mutex);
 	var.nf = 0;
 	free(philo);
 }

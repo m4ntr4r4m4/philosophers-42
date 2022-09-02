@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:14:10 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/08/31 18:56:19 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/09/02 09:45:30 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ typedef struct s_var{
 	int	nteat;
 	int	death;
 	int	forks;
-	pthread_mutex_t	mutex0;
+	pthread_mutex_t	mutex;
 	pthread_mutex_t	mutex1;
 	pthread_mutex_t	mutex2;
 }	t_var;
