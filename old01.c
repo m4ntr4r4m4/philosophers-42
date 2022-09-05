@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:13:41 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/09/02 17:50:07 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/09/05 11:22:41 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,9 @@ void	ft_death(t_var *var, int philo)
 
 	pthread_mutex_lock(&var->mutex);
 	var->death = 0;
-	pthread_mutex_unlock(&var->mutex);
 	gettimeofday(&start, NULL);
 	printf("%ld%04d philo %d died\n",start.tv_sec , (start.tv_usec) / 1000 , philo);
+	pthread_mutex_unlock(&var->mutex);
 	exit(0);
 }
 
@@ -31,23 +31,24 @@ void*	ft_create(void *arg)
 	int		philo;
 	long		lastmeal = 0;
 	long		tdeath = 1;
+	int			x;
 
 	t_var *var = arg;
 	philo = var->i + 1;
 	var->i++;
 	while (var->death)
 	{
-		gettimeofday(&start,&tz);
-		printf("%ld%04d philo %d is Thinking\n", start.tv_sec , (start.tv_usec) / 1000 , philo);
-	
+		
 		//// create eating routine
-		if ((tdeath - lastmeal) > 0 && var->death)
+		if ((tdeath - lastmeal) > var->td && var->death)
 		{
-			if (var->forks > 1)
+			gettimeofday(&start,&tz);
+			pthread_mutex_lock(&var->mutex);
+			x = var->forks;
+			if (x > 1)
 			{
-				printf("philo %d take forks %d\n", philo, var->forks);
-				pthread_mutex_lock(&var->mutex);
 				var->forks -= 2;
+				printf("philo %d take 2 forks %d\n", philo, var->forks);
 				pthread_mutex_unlock(&var->mutex);
 				gettimeofday(&start,&tz);
 				if (var->death)
@@ -56,7 +57,7 @@ void*	ft_create(void *arg)
 				pthread_mutex_lock(&var->mutex);
 				var->forks += 2;
 				pthread_mutex_unlock(&var->mutex);
-				printf("\n dropping fork\n");
+				printf("\n philo %d  dropping forks\n", philo);
 
 
 
@@ -68,8 +69,18 @@ void*	ft_create(void *arg)
 			
 		
 			}	
+			else
+				pthread_mutex_unlock(&var->mutex);
+			if(!x)
+			{
+				lastmeal = (start.tv_sec * 1000) + (start.tv_usec / 1000);
+				tdeath = ((var->td) / 1000) + (start.tv_sec * 1000) + (start.tv_usec / 1000);
+				printf("\nlast meal %ld\n\n tdeath %ld\n\n", lastmeal, tdeath);
+				gettimeofday(&start,&tz);
+				printf("%ld%04d philo %d is Thinking\n", start.tv_sec , (start.tv_usec) / 1000 , philo);
+			}
 		//// create sleeping routine
-			else if (var->death)
+			if (var->death)
 			{
 				gettimeofday(&start,&tz);
 				printf("%ld%04d philo %d is sleeping\n", start.tv_sec , (start.tv_usec) / 1000 , philo);
