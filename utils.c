@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:13:41 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/09/05 14:58:35 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/09/07 18:56:27 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,12 @@ t_var	ft_init(int ac,	char **av)
 	var.death = 1;
 	var.philo = malloc(sizeof(t_philo) * var.nf);
 	while (++var.i < var.nf)
+	{
 		var.philo[var.i].rightfork = 1;
+		var.philo[var.i].leftfork = 0;
+		pthread_mutex_init(&var.rfork, NULL);
+		pthread_mutex_init(&var.lfork, NULL);
+	}
 	if (ac > 5)
 		var.nteat = ft_atoi(av[5]);
 	return (var);

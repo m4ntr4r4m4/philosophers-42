@@ -6,94 +6,113 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:13:41 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/09/05 18:20:38 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/09/07 21:48:22 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	ft_death(t_var *var, int philo)
+long	ft_time()
 {
-	struct	timeval start;
-
-	pthread_mutex_lock(&var->mutex);
-	var->death = 0;
+	struct	timeval	start;
+	long	now;
+	
 	gettimeofday(&start, NULL);
-	printf("%ld%04d philo %d died\n",start.tv_sec , (start.tv_usec) / 1000 , philo);
-	pthread_mutex_unlock(&var->mutex);
-	exit(0);
+	now = ( start.tv_sec * 1000) + ( start.tv_usec / 1000);
+	return (now);
+}
+
+long	ft_eat(t_var *var, int id)
+{
+	long	lastmeal;
+
+	pthread_mutex_lock(&var->ate);
+	printf("**** %ld philo %d is eating\n", lastmeal = ft_time(), id);
+	usleep(var->teat);
+//	printf("\neating philo %d this rigt fork %d this is left fork %d\n" ,id, var->philo[id - 1].rightfork, var->philo[id - 1].leftfork);
+	if(!var->philo[id % var->nf].rightfork)
+		var->philo[id % var->nf].rightfork = 1;
+	if (var->philo[id - 1].leftfork)
+	{
+		var->philo[id - 1].leftfork = 0;
+		printf("------ %ld philo %d has drop a fork\n", ft_time(), id);
+	}
+//	printf("\nafter eating philo %d this rigt fork %d this is left fork %d\n" ,id, var->philo[id - 1].rightfork, var->philo[id - 1].leftfork);
+	lastmeal += (var->teat / 1000);
+	pthread_mutex_unlock(&var->ate);
+	return (lastmeal);
+}
+
+long	ft_takefork(t_var *var, int id, bool *e)
+{
+	long	lastmeal = 0;
+
+	pthread_mutex_lock(&var->rfork);
+//	printf(" ///////////// PHILO %d //////////////////// Philo + 1: %d\n", id , (id + 1 )% var->nf);
+	if(var->philo[id - 1].rightfork && var->philo[id % var->nf].rightfork && !var->philo[id % var->nf].leftfork)
+	{
+		var->philo[id % var->nf].rightfork = 0;
+		if (!var->philo[id - 1].leftfork && var->philo[id - 1].rightfork)
+		{
+			var->philo[id - 1].leftfork = 1;
+			printf("+++++ %ld philo %d has taken a fork\n", ft_time(), id);
+		}
+	}
+//	printf("\nphilo %d this rigt fork %d this is left fork %d\n" ,(id ) % var->nf, var->philo[id - 1].rightfork, var->philo[id - 1].leftfork);
+//	printf("\nphilo  %d this rigt fork %d this is left fork %d\n" ,(id + 1) % var->nf, var->philo[id % var->nf].rightfork, var->philo[id % var->nf].leftfork);
+//	printf("\nphilo  %d this rigt fork %d this is left fork %d\n" ,(id + 2)% var->nf, var->philo[(id + 1) % var->nf].rightfork, var->philo[(id + 1) % var->nf].leftfork);
+//	printf("\nphilo  %d this rigt fork %d this is left fork %d\n" ,(id + 3)% var->nf, var->philo[(id + 2) % var->nf].rightfork, var->philo[(id + 2) % var->nf].leftfork);
+//
+	if (var->philo[id - 1].rightfork && var->philo[id - 1].leftfork)
+	{
+		lastmeal = ft_eat(var, id);
+		*e = true;
+	}
+
+	pthread_mutex_unlock(&var->rfork);
+
+	return (lastmeal);
+}
+
+void	ft_sleep(t_var *var, int id, bool *e)
+{
+	bool slept;
+
+	slept = false;
+	if (*e)
+	{
+		printf("%ld philo %d is sleeping\n", ft_time() , id);
+		*e = true;
+		usleep(var->tsleep);
+		slept = true;
+	}
+	if (slept)
+		printf("%ld philo %d is thinking\n", ft_time() , id);
 }
 
 void*	ft_create(void *arg)
 {
-	struct	timeval start;
 	t_var	*var = arg;
-	int	id;
+	int		id;
+	bool	e;
 	long	lastmeal;
-	long	tdeath;
 
 	pthread_mutex_lock(&var->mutex);
 	id = var->i++ + 1;
 	pthread_mutex_unlock(&var->mutex);
+	e = false;
 	
+	if (var->nf % 2 == 0)
+		usleep(100);
+
 	//eating
 	while(var->death)
 	{
-		pthread_mutex_lock(&var->mutex);
-		gettimeofday(&start, NULL);
-		if(var->philo[id % var->nf].rightfork)
-			var->philo[id % var->nf].rightfork = 0;
-		if (!var->philo[id - 1].leftfork)
-			var->philo[id - 1].leftfork = 1;
-		pthread_mutex_unlock(&var->mutex);
+		lastmeal = ft_takefork(var, id, &e);
 
-		if (var->philo[id - 1].rightfork && var->philo[id - 1].leftfork)
-		{
-			pthread_mutex_lock(&var->mutex);
-			printf("%ld%04d philo %d is eating\n",start.tv_sec , (start.tv_usec) / 1000 , id);
-			pthread_mutex_unlock(&var->mutex);
-
-			usleep(var->teat);
-			pthread_mutex_lock(&var->mutex);
-			var->philo[id % var->nf].rightfork = 1;
-			var->philo[id - 1].leftfork = 0;
-			pthread_mutex_unlock(&var->mutex);
-
-			lastmeal =  (start.tv_sec * 10000) + (start.tv_usec / 1000) + (var->teat / 1000);
-			printf("\nphilo %d beegin eating  %ld - finish eating %ld\ntime to eat %d\n\n",id, lastmeal - (var->teat / 1000), lastmeal, var->teat / 1000);
-	//		tdeath = ((var->teat) + (var->tsleep)) / 1000;
-	//		lastmeal =  (start.tv_sec * 10000); 
-	//sleeping
-			pthread_mutex_lock(&var->mutex);
-			printf("%ld%04d philo %d is sleeping\n", start.tv_sec , (start.tv_usec) / 1000 , id);
-			usleep(var->tsleep);
-			pthread_mutex_unlock(&var->mutex);
-			/// check last meal
-			gettimeofday(&start, NULL);
-			tdeath = (start.tv_sec * 10000) + (start.tv_usec / 1000) - lastmeal;
-			printf("this philo %d  this is lastmeal %ld time now %ld\n", id, lastmeal , tdeath);
-			if (((var->td / 1000 ) - tdeath) < 0)
-			{
-				printf("*************** EROOOR ***************\n");
-				ft_death(var, id);
-				exit(0);
-			}
-			//
-	//thinking
-			pthread_mutex_lock(&var->mutex);
-			printf("%ld%04d philo %d is Thinking\n", start.tv_sec , (start.tv_usec) / 1000 , id);
-			pthread_mutex_unlock(&var->mutex);
-			/// check last meal
-			//
-
-
-		}
-
-
+		ft_sleep(var, id, &e);
+		e = false;
 	}
-
-
-
 	return (0);
 }
 
@@ -105,6 +124,7 @@ void	begin(t_var var)
 	var.i = 0;
 	i = 0;
 	pthread_mutex_init(&var.mutex, NULL);
+	pthread_mutex_init(&var.ate, NULL);
 	while (i < var.nf)
 	{
 		if (pthread_create(&var.philo[i].id, NULL, &ft_create, &var) != 0)
@@ -112,7 +132,6 @@ void	begin(t_var var)
 			printf("\nERROR\n");
 			return ;
 		}
-		usleep(2000);
 		i++;
 	}
 	i = 0;
@@ -124,7 +143,7 @@ void	begin(t_var var)
 
 	pthread_mutex_destroy(&var.mutex);
 	var.nf = 0;
-//	free(var.philo);
+	free(var.philo);
 }
 
 int	main(int ac, char **av)

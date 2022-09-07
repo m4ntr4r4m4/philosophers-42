@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:14:10 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/09/05 14:24:46 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/09/07 21:30:07 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 # include <unistd.h>
 # include <sys/time.h>
 # include <pthread.h>
+# include <stdbool.h>
+
 
 # define SUCCESS	1
 # define FAILURE	0
@@ -42,8 +44,19 @@ typedef struct s_var{
 	int	death;
 	int	forks;
 	pthread_mutex_t	mutex;
+	pthread_mutex_t	lfork;
+	pthread_mutex_t	rfork;
+	pthread_mutex_t	ate;
 	t_philo	*philo;
 }	t_var;
+
+long	ft_time();
+long	ft_eat(t_var *var, int id);
+long	ft_takefork(t_var *var, int id, bool *e);
+void	ft_sleep(t_var *var, int id, bool *e);
+
+
+void	*ft_creat(void *arg);
 int		ft_isnumeric(char *str);
 t_var	ft_init(int ac,	char **av);
 int		check_error(int ac, char **av);
