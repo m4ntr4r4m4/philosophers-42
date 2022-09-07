@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:13:41 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/09/07 21:48:22 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/09/07 22:04:22 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ long	ft_eat(t_var *var, int id)
 	long	lastmeal;
 
 	pthread_mutex_lock(&var->ate);
-	printf("**** %ld philo %d is eating\n", lastmeal = ft_time(), id);
+	printf("%ld philo %d is eating\n", lastmeal = ft_time(), id);
 	usleep(var->teat);
 //	printf("\neating philo %d this rigt fork %d this is left fork %d\n" ,id, var->philo[id - 1].rightfork, var->philo[id - 1].leftfork);
 	if(!var->philo[id % var->nf].rightfork)
@@ -35,7 +35,7 @@ long	ft_eat(t_var *var, int id)
 	if (var->philo[id - 1].leftfork)
 	{
 		var->philo[id - 1].leftfork = 0;
-		printf("------ %ld philo %d has drop a fork\n", ft_time(), id);
+//		printf("%ld philo %d has drop a fork\n", ft_time(), id);
 	}
 //	printf("\nafter eating philo %d this rigt fork %d this is left fork %d\n" ,id, var->philo[id - 1].rightfork, var->philo[id - 1].leftfork);
 	lastmeal += (var->teat / 1000);
@@ -55,20 +55,19 @@ long	ft_takefork(t_var *var, int id, bool *e)
 		if (!var->philo[id - 1].leftfork && var->philo[id - 1].rightfork)
 		{
 			var->philo[id - 1].leftfork = 1;
-			printf("+++++ %ld philo %d has taken a fork\n", ft_time(), id);
+			printf("%ld philo %d has taken a fork\n", ft_time(), id);
 		}
-	}
 //	printf("\nphilo %d this rigt fork %d this is left fork %d\n" ,(id ) % var->nf, var->philo[id - 1].rightfork, var->philo[id - 1].leftfork);
 //	printf("\nphilo  %d this rigt fork %d this is left fork %d\n" ,(id + 1) % var->nf, var->philo[id % var->nf].rightfork, var->philo[id % var->nf].leftfork);
 //	printf("\nphilo  %d this rigt fork %d this is left fork %d\n" ,(id + 2)% var->nf, var->philo[(id + 1) % var->nf].rightfork, var->philo[(id + 1) % var->nf].leftfork);
 //	printf("\nphilo  %d this rigt fork %d this is left fork %d\n" ,(id + 3)% var->nf, var->philo[(id + 2) % var->nf].rightfork, var->philo[(id + 2) % var->nf].leftfork);
 //
-	if (var->philo[id - 1].rightfork && var->philo[id - 1].leftfork)
-	{
-		lastmeal = ft_eat(var, id);
-		*e = true;
+		if (var->philo[id - 1].rightfork && var->philo[id - 1].leftfork)
+		{
+			lastmeal = ft_eat(var, id);
+			*e = true;
+		}
 	}
-
 	pthread_mutex_unlock(&var->rfork);
 
 	return (lastmeal);
