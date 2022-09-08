@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:13:41 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/09/08 03:43:14 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/09/08 18:34:22 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,4 +50,37 @@ t_var	ft_init(int ac,	char **av)
 	if (ac > 5)
 		var.nteat = ft_atoi(av[5]);
 	return (var);
+}
+
+long	ft_time(void)
+{
+	struct timeval	start;
+	long			now;
+
+	gettimeofday(&start, NULL);
+	now = (start.tv_sec * 1000) + (start.tv_usec / 1000);
+	return (now);
+}
+
+void	ft_print(t_var *var, int id, int i)
+{
+	long	now;
+
+	pthread_mutex_lock(&var->dead);
+	now = ft_time();
+	if (i == 1)
+	{
+		var->death = 0;
+		printf("%ld philo %d died\n", now, id);
+		exit(0);
+	}
+	else if (i == 2)
+		printf("%ld philo %d has taken a fork\n", now, id);
+	else if (i == 3)
+		printf("%ld philo %d is eating\n", now, id);
+	else if (i == 4)
+		printf("%ld philo %d is sleeping\n", now, id);
+	else if (i == 5)
+		printf("%ld philo %d is thinking\n", now, id);
+	pthread_mutex_unlock(&var->dead);
 }
