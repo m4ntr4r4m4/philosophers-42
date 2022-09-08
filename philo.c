@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:13:41 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/09/08 02:21:41 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/09/08 04:07:12 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,11 @@ void	ft_death(t_var *var, int philo)
 {
 	long	now;
 
-	pthread_mutex_lock(&var->mutex);
+	pthread_mutex_lock(&var->dead);
 	var->death = 0;
 	now = ft_time();
 	printf("%ld philo %d died\n",now , philo);
-	pthread_mutex_unlock(&var->mutex);
+	pthread_mutex_unlock(&var->dead);
 	exit(0);
 }
 
@@ -39,8 +39,9 @@ long	ft_eat(t_var *var, int id)
 	long	lastmeal = 0;
 
 	pthread_mutex_lock(&var->ate);
-	printf("%ld philo %d is eating\n", lastmeal = ft_time(), id);
+	printf("%ld philo %d is eating\n", ft_time(), id);
 	usleep(var->teat);
+	lastmeal = ft_time();
 //	printf("\neating philo %d this rigt fork %d this is left fork %d\n" ,id, var->philo[id - 1].rightfork, var->philo[id - 1].leftfork);
 
 
@@ -55,8 +56,8 @@ long	ft_eat(t_var *var, int id)
 			printf("philo %d has drop a fork\n", id);
 		}
 	}
-	lastmeal += (var->teat / 1000);
 	pthread_mutex_unlock(&var->ate);
+//	printf("this is last meal %ld\n", lastmeal);
 //	printf("\nafter eating philo %d this rigt fork %d this is left fork %d\n" ,id, var->philo[id - 1].rightfork, var->philo[id - 1].leftfork);
 	return (lastmeal);
 }
@@ -84,6 +85,7 @@ long	ft_takefork(t_var *var, int id, bool *e)
 		{
 			pthread_mutex_unlock(&var->rfork);
 			lastmeal = ft_eat(var, id);
+//			printf("this is last meal %ld\n", lastmeal);
 			*e = true;
 		}
 
@@ -92,6 +94,7 @@ long	ft_takefork(t_var *var, int id, bool *e)
 		pthread_mutex_unlock(&var->rfork);
 
 
+//		printf("this is last meal %ld\n", lastmeal);
 	return (lastmeal);
 }
 
@@ -116,16 +119,20 @@ void*	ft_create(void *arg)
 	t_var	*var = arg;
 	int		id;
 	bool	e;
-	long	lastmeal;
+	long	lastmeal = ft_time();
 	long	tdeath;
 
 	pthread_mutex_lock(&var->mutex);
 	id = var->i++ + 1;
+	var->philo[id - 1].rightfork = 1;
+	var->philo[id - 1].leftfork = 0;
+	pthread_mutex_init(&var->rfork, NULL);
+	pthread_mutex_init(&var->lfork, NULL);
 	printf("philo %d created\n", id);
 	pthread_mutex_unlock(&var->mutex);
 
 
-
+	usleep(1500);
 	e = false;
 	
 
@@ -135,12 +142,7 @@ void*	ft_create(void *arg)
 	{
 		pthread_mutex_unlock(&var->lfork);
 		lastmeal = ft_takefork(var, id, &e);
-		printf("this is last meal %ld\n", lastmeal);
-//		tdeath = ft_time();
-//		printf("PHILO %d this tdeath %ld\nthis is lastmeal %ld\n", id, tdeath, lastmeal);
-
-//		if (tdeath - lastmeal > var->td && lastmeal != 0)
-//			ft_death(var, id);
+//		printf("this is last meal %ld\n", lastmeal);
 
 		ft_sleep(var, id, &e);
 //		tdeath = ft_time();
@@ -148,6 +150,15 @@ void*	ft_create(void *arg)
 //		if (tdeath - lastmeal > var->td && lastmeal != 0)
 //			ft_death(var, id);
 
+		tdeath = ft_time();
+		tdeath += var->tsleep / 1000;
+		if (lastmeal != 0)
+		{
+			printf("PHILO %d %ld this tdeath %ld\nthis is lastmeal %ld\n", id, tdeath - lastmeal , tdeath, lastmeal);
+
+			if (tdeath - lastmeal > var->td / 1000)
+				ft_death(var, id);
+		}
 		e = false;
 		pthread_mutex_lock(&var->lfork);
 	}
