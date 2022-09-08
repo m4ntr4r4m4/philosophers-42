@@ -6,11 +6,12 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:13:41 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/09/08 04:07:12 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/09/08 17:44:48 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
 
 long	ft_time()
 {
@@ -20,6 +21,29 @@ long	ft_time()
 	gettimeofday(&start, NULL);
 	now = ( start.tv_sec * 1000) + ( start.tv_usec / 1000);
 	return (now);
+}
+
+void	ft_print(t_var *var, int id, int i)
+{
+	long	now;
+
+	pthread_mutex_lock(&var->dead);
+	now = ft_time();
+	if (i == 1)
+	{
+		var->death = 0;
+		printf("%ld philo %d died\n",now , id);
+		exit(0);
+	}
+	else if (i == 2)
+		printf("%ld philo %d has taken a fork\n", now, id);
+	else if (i == 3)
+		printf("%ld philo %d is eating\n", now, id);
+	else if (i == 4)
+		printf("%ld philo %d is sleeping\n", now, id);
+	else if (i == 5)
+		printf("%ld philo %d is thinking\n", now, id);
+	pthread_mutex_unlock(&var->dead);
 }
 
 void	ft_death(t_var *var, int philo)
@@ -39,7 +63,8 @@ long	ft_eat(t_var *var, int id)
 	long	lastmeal = 0;
 
 	pthread_mutex_lock(&var->ate);
-	printf("%ld philo %d is eating\n", ft_time(), id);
+	ft_print(var, id, 3);
+//	printf("%ld philo %d is eating\n", ft_time(), id);
 	usleep(var->teat);
 	lastmeal = ft_time();
 //	printf("\neating philo %d this rigt fork %d this is left fork %d\n" ,id, var->philo[id - 1].rightfork, var->philo[id - 1].leftfork);
@@ -53,7 +78,7 @@ long	ft_eat(t_var *var, int id)
 		if (var->philo[id - 1].leftfork)
 		{
 			var->philo[id - 1].leftfork = 0;
-			printf("philo %d has drop a fork\n", id);
+//			printf("philo %d has drop a fork\n", id);
 		}
 	}
 	pthread_mutex_unlock(&var->ate);
@@ -74,7 +99,8 @@ long	ft_takefork(t_var *var, int id, bool *e)
 		if (!var->philo[id - 1].leftfork && var->philo[id - 1].rightfork)
 		{
 			var->philo[id - 1].leftfork = 1;
-			printf("%ld philo %d has taken a fork\n", ft_time(), id);
+			ft_print(var, id, 2);
+//			printf("%ld philo %d has taken a fork\n", ft_time(), id);
 		}
 //	printf("\nphilo %d this rigt fork %d this is left fork %d\n" ,(id ) % var->nf, var->philo[id - 1].rightfork, var->philo[id - 1].leftfork);
 //	printf("\nphilo  %d this rigt fork %d this is left fork %d\n" ,(id + 1) % var->nf, var->philo[id % var->nf].rightfork, var->philo[id % var->nf].leftfork);
@@ -105,13 +131,15 @@ void	ft_sleep(t_var *var, int id, bool *e)
 	slept = false;
 	if (*e)
 	{
-		printf("%ld philo %d is sleeping\n", ft_time() , id);
+		ft_print(var, id, 4);
+//		printf("%ld philo %d is sleeping\n", ft_time() , id);
 		*e = true;
 		usleep(var->tsleep);
 		slept = true;
 	}
 	if (slept)
-		printf("%ld philo %d is thinking\n", ft_time() , id);
+		ft_print(var, id, 5);
+	//	printf("%ld philo %d is thinking\n", ft_time() , id);
 }
 
 void*	ft_create(void *arg)
@@ -128,7 +156,7 @@ void*	ft_create(void *arg)
 	var->philo[id - 1].leftfork = 0;
 	pthread_mutex_init(&var->rfork, NULL);
 	pthread_mutex_init(&var->lfork, NULL);
-	printf("philo %d created\n", id);
+//	printf("philo %d created\n", id);
 	pthread_mutex_unlock(&var->mutex);
 
 
@@ -154,10 +182,11 @@ void*	ft_create(void *arg)
 		tdeath += var->tsleep / 1000;
 		if (lastmeal != 0)
 		{
-			printf("PHILO %d %ld this tdeath %ld\nthis is lastmeal %ld\n", id, tdeath - lastmeal , tdeath, lastmeal);
+		//	printf("PHILO %d %ld this tdeath %ld\nthis is lastmeal %ld\n", id, tdeath - lastmeal , tdeath, lastmeal);
 
 			if (tdeath - lastmeal > var->td / 1000)
-				ft_death(var, id);
+				ft_print(var, id, 1);
+//				ft_death(var, id);
 		}
 		e = false;
 		pthread_mutex_lock(&var->lfork);
@@ -170,7 +199,7 @@ void	begin(t_var var)
 {
 	int	i;
 
-	printf("this is number of philos = %d\n\n", var.nf);
+//	printf("this is number of philos = %d\n\n", var.nf);
 	var.i = 0;
 	i = 0;
 	pthread_mutex_init(&var.mutex, NULL);
