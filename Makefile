@@ -6,7 +6,7 @@
 #    By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/07 13:14:42 by ahammoud          #+#    #+#              #
-#    Updated: 2022/09/07 21:42:43 by ahammoud         ###   ########.fr        #
+#    Updated: 2022/09/08 02:32:47 by ahammoud         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ OBJS	=	${SRCS:.c=.o}
 
 NAME	=	 philo
 
-CFLAGS	=	-Wall -Werror -Wextra  -pthread  
+CFLAGS	=	-Wall   -pthread  
 
 
 CC	=	gcc
