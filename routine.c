@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/08 18:38:49 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/09/08 18:39:03 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/09/13 17:33:35 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ long	ft_eat(t_var *var, int id)
 {
 	long	lastmeal;
 
-	pthread_mutex_lock(&var->ate);
+	pthread_mutex_lock(&var->rfork);
 	ft_print(var, id, 3);
 	usleep(var->teat);
 	lastmeal = ft_time();
@@ -26,7 +26,7 @@ long	ft_eat(t_var *var, int id)
 		if (var->philo[id - 1].leftfork)
 			var->philo[id - 1].leftfork = 0;
 	}
-	pthread_mutex_unlock(&var->ate);
+	pthread_mutex_unlock(&var->rfork);
 	return (lastmeal);
 }
 

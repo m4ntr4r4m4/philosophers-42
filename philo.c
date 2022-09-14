@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:13:41 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/09/08 18:45:56 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/09/13 17:43:02 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,11 @@ int	ft_philo_init(t_var *var)
 {
 	int	id;
 
-	pthread_mutex_lock(&var->mutex);
+	pthread_mutex_lock(&var->rfork);
 	id = var->i++ + 1;
 	var->philo[id - 1].rightfork = 1;
 	var->philo[id - 1].leftfork = 0;
-	pthread_mutex_init(&var->rfork, NULL);
-	pthread_mutex_init(&var->lfork, NULL);
-	pthread_mutex_unlock(&var->mutex);
+	pthread_mutex_unlock(&var->rfork);
 	usleep(1500);
 	return (id);
 }
@@ -37,12 +35,14 @@ void	*ft_create(void *arg)
 
 	var = arg;
 	lastmeal = ft_time();
-	id = ft_philo_init(var);
-	e = false;
 	pthread_mutex_lock(&var->lfork);
+	id = ft_philo_init(var);
+	pthread_mutex_unlock(&var->lfork);
+	e = false;
+	pthread_mutex_lock(&var->dead);
 	while (var->death)
 	{
-		pthread_mutex_unlock(&var->lfork);
+		pthread_mutex_unlock(&var->dead);
 		lastmeal = ft_takefork(var, id, &e);
 		ft_sleep(var, id, &e);
 		tdeath = ft_time() + var->tsleep / 1000;
@@ -50,9 +50,9 @@ void	*ft_create(void *arg)
 			if (tdeath - lastmeal > var->td / 1000)
 				ft_print(var, id, 1);
 		e = false;
-		pthread_mutex_lock(&var->lfork);
+		pthread_mutex_lock(&var->dead);
 	}
-	pthread_mutex_unlock(&var->lfork);
+	pthread_mutex_unlock(&var->dead);
 	return (0);
 }
 
@@ -63,6 +63,8 @@ void	begin(t_var var)
 	var.i = 0;
 	i = -1;
 	pthread_mutex_init(&var.mutex, NULL);
+	pthread_mutex_init(&var.rfork, NULL);
+	pthread_mutex_init(&var.lfork, NULL);
 	pthread_mutex_init(&var.ate, NULL);
 	while (++i < var.nf)
 	{

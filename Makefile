@@ -6,7 +6,7 @@
 #    By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/07 13:14:42 by ahammoud          #+#    #+#              #
-#    Updated: 2022/09/08 02:32:47 by ahammoud         ###   ########.fr        #
+#    Updated: 2022/09/13 17:39:24 by ahammoud         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,14 +19,14 @@ OBJS	=	${SRCS:.c=.o}
 
 NAME	=	 philo
 
-CFLAGS	=	-Wall   -pthread  
+CFLAGS	=	-Wall   -pthread -g -fsanitize=thread
 
 
-CC	=	gcc
+CC	=	clang
 
 
 ${NAME}	:	${OBJS} 
-			${CC}  ${OBJS}  -o ${NAME}
+			${CC} ${CFLAGS}  ${OBJS}  -o ${NAME}
 
 all	:	${NAME}
 
