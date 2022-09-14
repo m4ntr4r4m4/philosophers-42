@@ -18,6 +18,7 @@ int	ft_philo_init(t_var *var)
 
 	pthread_mutex_lock(&var->rfork);
 	id = var->i++ + 1;
+	var->philo[id - 1].eaten = var->nteat;
 	var->philo[id - 1].rightfork = 1;
 	var->philo[id - 1].leftfork = 0;
 	pthread_mutex_unlock(&var->rfork);
@@ -39,8 +40,9 @@ void	*ft_create(void *arg)
 	id = ft_philo_init(var);
 	pthread_mutex_unlock(&var->lfork);
 	e = false;
+	printf("\nthis is eaten %d\n",  var->philo[id - 1].eaten );
 	pthread_mutex_lock(&var->dead);
-	while (var->death)
+	while (var->death && var->philo[id - 1].eaten != 0)
 	{
 		pthread_mutex_unlock(&var->dead);
 		lastmeal = ft_takefork(var, id, &e);
@@ -50,6 +52,7 @@ void	*ft_create(void *arg)
 			if (tdeath - lastmeal > var->td / 1000)
 				ft_print(var, id, 1);
 		e = false;
+		var->philo[id - 1].eaten--;
 		pthread_mutex_lock(&var->dead);
 	}
 	pthread_mutex_unlock(&var->dead);

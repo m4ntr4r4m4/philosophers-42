@@ -28,6 +28,7 @@ typedef struct s_philo{
 	pthread_t		id;
 	int				rightfork;
 	int				leftfork;
+	int				eaten;
 	struct t_var	*var;
 }	t_philo;
 typedef struct s_var{

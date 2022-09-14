@@ -45,6 +45,7 @@ t_var	ft_init(int ac,	char **av)
 	var.tsleep = ft_atoi(av[4]) * 1000;
 	var.forks = var.nf;
 	var.death = 1;
+	var.nteat = -1;
 	pthread_mutex_init(&var.dead, NULL);
 	var.philo = malloc(sizeof(t_philo) * var.nf);
 	if (ac > 5)
