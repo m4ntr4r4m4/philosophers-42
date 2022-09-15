@@ -16,9 +16,9 @@ long	ft_eat(t_var *var, int id)
 {
 	long	lastmeal;
 
+	lastmeal = ft_time();
 	ft_print(var, id, 3);
 	usleep(var->teat);
-	lastmeal = ft_time();
 	if (!var->philo[id % var->nf].rightfork)
 	{
 		var->philo[id % var->nf].rightfork = 1;
@@ -30,9 +30,6 @@ long	ft_eat(t_var *var, int id)
 
 long	ft_takefork(t_var *var, int id, long lm, bool *e)
 {
-	long	lastmeal;
-
-	lastmeal = 0;
 	pthread_mutex_lock(&var->rfork);
 	check_starvation(var, lm, id);
 	if (var->philo[id - 1].rightfork && \
@@ -48,27 +45,29 @@ long	ft_takefork(t_var *var, int id, long lm, bool *e)
 		}
 		if (var->philo[id - 1].rightfork && var->philo[id - 1].leftfork)
 		{
-			lastmeal = ft_eat(var, id);
 			pthread_mutex_unlock(&var->rfork);
 			*e = true;
+			return (1);
 		}
 	}
 	else
 		pthread_mutex_unlock(&var->rfork);
-	return (lastmeal);
+	return (0);
 }
 
-void	ft_sleep(t_var *var, int id, bool *e)
+void	ft_sleep(t_var *var, int id, bool *e, long lastmeal)
 {
 	bool	slept;
 
 	slept = false;
 	if (*e)
 	{
+		check_starvation(var, lastmeal, id);
 		ft_print(var, id, 4);
 		*e = true;
 		usleep(var->tsleep);
 		slept = true;
+		check_starvation(var, lastmeal, id);
 	}
 	if (slept)
 		ft_print(var, id, 5);

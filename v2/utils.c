@@ -56,7 +56,6 @@ t_var	ft_init(int ac,	char **av)
 	ft_philo_init(&var);
 	if (ac > 5)
 		var.nteat = ft_atoi(av[5]);
-	var.origin = ft_time();
 	return (var);
 }
 

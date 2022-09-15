@@ -19,7 +19,7 @@ OBJS	=	${SRCS:.c=.o}
 
 NAME	=	 philo
 
-CFLAGS	=	 -ofast -Wall  -pthread 
+CFLAGS	=	  -Wall  -pthread 
 
 
 CC	=	clang

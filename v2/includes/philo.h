@@ -57,7 +57,7 @@ void	check_starvation(t_var *var, long lastmeal,int id);
 void	ft_print(t_var *var, int id, int i);
 long	ft_eat(t_var *var, int id);
 long	ft_takefork(t_var *var, int id, long lm, bool *e);
-void	ft_sleep(t_var *var, int id, bool *e);
+void	ft_sleep(t_var *var, int id, bool *e, long lastmeal);
 void	*ft_creat(void *arg);
 int		ft_isnumeric(char *str);
 t_var	ft_init(int ac,	char **av);
