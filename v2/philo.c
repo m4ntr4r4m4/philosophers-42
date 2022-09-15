@@ -12,44 +12,26 @@
 
 #include "philo.h"
 
-int	ft_philo_init(t_var *var)
-{
-	int	id;
-
-	pthread_mutex_lock(&var->rfork);
-	id = var->i++ + 1;
-	var->philo[id - 1].eaten = var->nteat;
-	var->philo[id - 1].rightfork = 1;
-	var->philo[id - 1].leftfork = 0;
-	pthread_mutex_unlock(&var->rfork);
-	usleep(1500);
-	return (id);
-}
-
 void	*ft_create(void *arg)
 {
 	t_var	*var;
 	int		id;
 	bool	e;
 	long	lastmeal;
-	long	tdeath;
-
+	
 	var = arg;
-	lastmeal = ft_time();
-	pthread_mutex_lock(&var->lfork);
-	id = ft_philo_init(var);
-	pthread_mutex_unlock(&var->lfork);
+	pthread_mutex_lock(&var->dead);
+	id = var->i++ +1;
+	pthread_mutex_unlock(&var->dead);
+	lastmeal = var->origin;
 	e = false;
 	pthread_mutex_lock(&var->dead);
 	while (var->death && var->philo[id - 1].eaten != 0)
 	{
 		pthread_mutex_unlock(&var->dead);
-		lastmeal = ft_takefork(var, id, &e);
+		lastmeal = ft_takefork(var, id, lastmeal, &e);
 		ft_sleep(var, id, &e);
-		tdeath = ft_time() + var->tsleep / 1000;
-		if (lastmeal != 0)
-			if (tdeath - lastmeal > var->td / 1000)
-				ft_print(var, id, 1);
+		check_starvation(var, lastmeal, id);
 		e = false;
 		var->philo[id - 1].eaten--;
 		pthread_mutex_lock(&var->dead);
@@ -64,11 +46,6 @@ void	begin(t_var var)
 
 	var.i = 0;
 	i = -1;
-	pthread_mutex_init(&var.mutex, NULL);
-	pthread_mutex_init(&var.rfork, NULL);
-	pthread_mutex_init(&var.lfork, NULL);
-	pthread_mutex_init(&var.ate, NULL);
-	var.origin = ft_time();
 	while (++i < var.nf)
 	{
 		if (pthread_create(&var.philo[i].id, NULL, &ft_create, &var) != 0)

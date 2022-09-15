@@ -46,10 +46,17 @@ t_var	ft_init(int ac,	char **av)
 	var.forks = var.nf;
 	var.death = 1;
 	var.nteat = -1;
+	pthread_mutex_init(&var.mutex, NULL);
+	pthread_mutex_init(&var.rfork, NULL);
+	pthread_mutex_init(&var.lfork, NULL);
+	pthread_mutex_init(&var.ate, NULL);
 	pthread_mutex_init(&var.dead, NULL);
+	pthread_mutex_init(&var.print, NULL);
 	var.philo = malloc(sizeof(t_philo) * var.nf);
+	ft_philo_init(&var);
 	if (ac > 5)
 		var.nteat = ft_atoi(av[5]);
+	var.origin = ft_time();
 	return (var);
 }
 
@@ -63,16 +70,42 @@ long	ft_time(void)
 	return (now);
 }
 
+void	ft_philo_init(t_var *var)
+{
+	int	i;
+
+	i = -1;
+	while (++i < var->nf)
+	{
+		var->philo[i].eaten = var->nteat;
+		var->philo[i].rightfork = 1;
+		var->philo[i].leftfork = 0;
+	}
+}
+
+void	check_starvation(t_var *var, long lastmeal,int id)
+{
+	long	tdeath;
+
+
+	tdeath = ft_time();
+	if (lastmeal != 0)
+		if (tdeath - lastmeal > var->td / 1000)
+			ft_print(var, id, 1);
+}
+
 void	ft_print(t_var *var, int id, int i)
 {
 	long	now;
 
-	pthread_mutex_lock(&var->dead);
+	pthread_mutex_lock(&var->print);
 	now = ft_time();
 	if (i == 1)
 	{
+		pthread_mutex_lock(&var->dead);
 		var->death = 0;
 		printf("%ld philo %d died\n", now - var->origin, id);
+		pthread_mutex_unlock(&var->dead);
 		exit(0);
 	}
 	else if (i == 2)
@@ -83,5 +116,5 @@ void	ft_print(t_var *var, int id, int i)
 		printf("%ld philo %d is sleeping\n", now - var->origin, id);
 	else if (i == 5)
 		printf("%ld philo %d is thinking\n", now - var->origin, id);
-	pthread_mutex_unlock(&var->dead);
+	pthread_mutex_unlock(&var->print);
 }
