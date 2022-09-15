@@ -62,11 +62,10 @@ t_var	ft_init(int ac,	char **av)
 long	ft_time(void)
 {
 	struct timeval	start;
-	long			now;
 
-	gettimeofday(&start, NULL);
-	now = (start.tv_sec * 1000) + (start.tv_usec / 1000);
-	return (now);
+	if(gettimeofday(&start, NULL))
+		return (0);
+	return (start.tv_sec * 1000000) + (start.tv_usec);
 }
 
 void	ft_philo_init(t_var *var)
@@ -88,9 +87,8 @@ void	check_starvation(t_var *var, long lastmeal,int id)
 
 
 	tdeath = ft_time();
-	if (lastmeal != 0)
-		if (tdeath - lastmeal > var->td / 1000)
-			ft_print(var, id, 1);
+	if ((tdeath - lastmeal) / 1000  > var->td / 1000)
+		ft_print(var, id, 1);
 }
 
 void	ft_print(t_var *var, int id, int i)
@@ -103,17 +101,20 @@ void	ft_print(t_var *var, int id, int i)
 	{
 		pthread_mutex_lock(&var->dead);
 		var->death = 0;
-		printf("%ld philo %d died\n", now - var->origin, id);
+		printf("%ld philo %d died\n", (now - var->origin) / 1000, id);
 		pthread_mutex_unlock(&var->dead);
 		exit(0);
 	}
 	else if (i == 2)
-		printf("%ld philo %d has taken a fork\n", now - var->origin, id);
+	{
+		printf("%ld philo %d has taken a fork\n", (now - var->origin) / 1000, id);
+		printf("%ld philo %d has taken a fork\n", (now - var->origin) / 1000, id);
+	}
 	else if (i == 3)
-		printf("%ld philo %d is eating\n", now - var->origin, id);
+		printf("%ld philo %d is eating\n", (now - var->origin) / 1000, id);
 	else if (i == 4)
-		printf("%ld philo %d is sleeping\n", now - var->origin, id);
+		printf("%ld philo %d is sleeping\n", (now - var->origin) / 1000, id);
 	else if (i == 5)
-		printf("%ld philo %d is thinking\n", now - var->origin, id);
+		printf("%ld philo %d is thinking\n", (now - var->origin) / 1000, id);
 	pthread_mutex_unlock(&var->print);
 }
