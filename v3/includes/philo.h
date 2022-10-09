@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:14:10 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/09/08 18:48:53 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/10/09 16:55:45 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,12 @@ long	ft_time(void);
 void	ft_print(t_var *var, int id, int i);
 long	ft_eat(t_var *var, int id);
 long	ft_takefork(t_var *var, int id);
-void	ft_sleep(t_var *var, int id, bool *e);
+void	ft_sleep(t_var *var, int id, long lastmeal);
 void	*ft_creat(void *arg);
 int		ft_isnumeric(char *str);
 t_var	ft_init(int ac,	char **av);
 int		check_error(int ac, char **av);
 long	ft_atoi(const char *str);
+void	check_starvation(t_var *var, long lastmeal,int id);
 
 #endif

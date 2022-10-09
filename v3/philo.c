@@ -6,46 +6,61 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:13:41 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/09/13 17:43:02 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/10/09 16:55:02 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+
+
 long	ft_takefork(t_var *var, int id)
 {
 
 	pthread_mutex_lock(&var->fork[id - 1]);
-	printf("\ntakefor right \n");
-	pthread_mutex_unlock(&var->fork[id - 1]);
-	pthread_mutex_lock(&var->fork[(id % var->nf)]);
-	printf("\ntakefor left\n");
-	pthread_mutex_unlock(&var->fork[(id % var->nf)]);
-
-
-
-	return (0);
+	if (var->philo[id - 1].rightfork)
+	{
+		pthread_mutex_lock(&var->fork[(id % var->nf)]);
+		if (var->philo[id % var->nf].rightfork && !var->philo[id % var->nf].leftfork)
+		{
+			var->philo[id % var->nf].rightfork = 0;
+			var->philo[id - 1].leftfork = 1;
+		}
+	}
+	if (var->philo[id - 1].leftfork && var->philo[id - 1].rightfork)
+	{
+		ft_print(var, id, 2);
+		return (SUCCESS);
+	}
+	return (FAILURE);
 }
 
 
 void	*ft_create(void *arg)
 {
 	t_var	*var;
-	t_philo *philo;
-	int x;
 	int	id;
+	long	lastmeal;
 
 	var = arg;
 	pthread_mutex_lock(&var->mutex);
 	id = var->i++ + 1;  
 	pthread_mutex_unlock(&var->mutex);
-	philo = var->philo;
-	x = id % var->nf;
-	while(1)
+	lastmeal = var->origin;
+	pthread_mutex_lock(&var->dead);
+	while(var->death)
 	{
-		ft_takefork(var, id);
-		break;
+		pthread_mutex_unlock(&var->dead);
+		check_starvation(var, lastmeal, id);
+		if (ft_takefork(var, id))
+		{
+			lastmeal = ft_eat(var, id);
+			check_starvation(var, lastmeal, id);
+			ft_sleep(var, id, lastmeal);
+		}
+		pthread_mutex_lock(&var->dead);
 	}
+	pthread_mutex_unlock(&var->dead);
 	return (0);
 
 }
