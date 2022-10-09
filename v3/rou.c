@@ -16,56 +16,61 @@ long	ft_eat(t_var *var, int id)
 {
 	long	lastmeal;
 
-	lastmeal = ft_time();
-	ft_print(var, id, lastmeal,3);
-	ft_time_sleep(var->teat);
 	pthread_mutex_lock(&var->rfork);
-	if (!var->philo[id % var->nf].rightfork && var->philo[id - 1].leftfork)
+	ft_print(var, id, 3);
+	usleep(var->teat);
+	lastmeal = ft_time();
+	if (!var->philo[id % var->nf].rightfork)
 	{
 		var->philo[id % var->nf].rightfork = 1;
-		var->philo[id - 1].leftfork = 0;
+		if (var->philo[id - 1].leftfork)
+			var->philo[id - 1].leftfork = 0;
 	}
 	pthread_mutex_unlock(&var->rfork);
 	return (lastmeal);
 }
 
-long	ft_takefork(t_var *var, int id, long lm, bool *e)
+long	ft_takefork(t_var *var, int id, bool *e)
 {
+	long	lastmeal;
+
+	lastmeal = 0;
 	pthread_mutex_lock(&var->rfork);
 	if (var->philo[id - 1].rightfork && \
 			var->philo[id % var->nf].rightfork \
 			&& !var->philo[id % var->nf].leftfork)
 	{
+		ft_print(var, id, 2);
 		var->philo[id % var->nf].rightfork = 0;
 		if (!var->philo[id - 1].leftfork && var->philo[id - 1].rightfork)
 		{
 			var->philo[id - 1].leftfork = 1;
-			ft_print(var, id, ft_time(),2);
+			ft_print(var, id, 2);
 		}
 		if (var->philo[id - 1].rightfork && var->philo[id - 1].leftfork)
 		{
 			pthread_mutex_unlock(&var->rfork);
+			lastmeal = ft_eat(var, id);
 			*e = true;
-			return (1);
 		}
 	}
 	else
 		pthread_mutex_unlock(&var->rfork);
-	return (0);
+	return (lastmeal);
 }
 
-void	ft_sleep(t_var *var, int id, bool *e, long lastmeal)
+void	ft_sleep(t_var *var, int id, bool *e)
 {
 	bool	slept;
 
 	slept = false;
 	if (*e)
 	{
-		ft_print(var, id, ft_time(),4);
-		ft_time_sleep(var->teat);
+		ft_print(var, id, 4);
 		*e = true;
+		usleep(var->tsleep);
 		slept = true;
 	}
 	if (slept)
-		ft_print(var, id, ft_time(),5);
+		ft_print(var, id, 5);
 }

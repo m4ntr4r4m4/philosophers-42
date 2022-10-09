@@ -23,10 +23,10 @@
 # include <stdbool.h>
 # define SUCCESS	1
 # define FAILURE	0
-
+struct	t_philo;
+struct	t_var;
 typedef struct s_philo{
 	pthread_t		id;
-	int			i;
 	int				rightfork;
 	int				leftfork;
 	int				eaten;
@@ -40,25 +40,20 @@ typedef struct s_var{
 	int				tsleep;
 	int				nteat;
 	int				death;
-	int				forks;
-	long				origin;
-	pthread_mutex_t	mutex;
-	pthread_mutex_t	lfork;
-	pthread_mutex_t	rfork;
-	pthread_mutex_t	ate;
-	pthread_mutex_t	dead;
-	pthread_mutex_t	print;
+	time_t				origin;
+	pthread_mutex_t		mutex;
+	pthread_mutex_t		*fork;
+	pthread_mutex_t		dead;
+	pthread_mutex_t		print;
 	t_philo			*philo;
 }	t_var;
 
-void	ft_time_sleep(int time);
-long	ft_time(void);
 void	ft_philo_init(t_var *var);
-void	check_starvation(t_var *var, long lastmeal,int id);
-void	ft_print(t_var *var, int id, long time,int i);
+long	ft_time(void);
+void	ft_print(t_var *var, int id, int i);
 long	ft_eat(t_var *var, int id);
-long	ft_takefork(t_var *var, int id, long lm, bool *e);
-void	ft_sleep(t_var *var, int id, bool *e, long lastmeal);
+long	ft_takefork(t_var *var, int id);
+void	ft_sleep(t_var *var, int id, bool *e);
 void	*ft_creat(void *arg);
 int		ft_isnumeric(char *str);
 t_var	ft_init(int ac,	char **av);
