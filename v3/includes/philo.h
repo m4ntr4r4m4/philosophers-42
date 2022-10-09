@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:14:10 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/10/09 16:55:45 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/10/09 17:28:39 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,9 @@
 # include <stdbool.h>
 # define SUCCESS	1
 # define FAILURE	0
-struct	t_philo;
-struct	t_var;
+
+struct	s_philo;
+struct	s_var;
 typedef struct s_philo{
 	pthread_t		id;
 	int				rightfork;
@@ -33,19 +34,19 @@ typedef struct s_philo{
 	struct t_var	*var;
 }	t_philo;
 typedef struct s_var{
-	int				i;
-	int				nf;
-	int				td;
-	int				teat;
-	int				tsleep;
-	int				nteat;
-	int				death;
+	int					i;
+	int					nf;
+	int					td;
+	int					teat;
+	int					tsleep;
+	int					nteat;
+	int					death;
 	time_t				origin;
 	pthread_mutex_t		mutex;
 	pthread_mutex_t		*fork;
 	pthread_mutex_t		dead;
 	pthread_mutex_t		print;
-	t_philo			*philo;
+	t_philo				*philo;
 }	t_var;
 
 void	ft_philo_init(t_var *var);
@@ -59,6 +60,6 @@ int		ft_isnumeric(char *str);
 t_var	ft_init(int ac,	char **av);
 int		check_error(int ac, char **av);
 long	ft_atoi(const char *str);
-void	check_starvation(t_var *var, long lastmeal,int id);
+void	check_starvation(t_var *var, long lastmeal, int id);
 
 #endif

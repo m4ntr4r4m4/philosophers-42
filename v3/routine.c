@@ -6,20 +6,30 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/09 15:45:30 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/10/09 16:46:51 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/10/09 17:26:27 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+long	ft_time(void)
+{
+	struct timeval	start;
+
+	if (gettimeofday(&start, NULL))
+		return (0);
+	return ((start.tv_sec * 1000000) + (start.tv_usec));
+}
+
 void	ft_time_sleep(int time)
 {
 	long	now;
+
 	now = ft_time();
 	while (true)
 	{
-		if (ft_time() - now >= time )
-			break;
+		if (ft_time() - now >= time)
+			break ;
 		usleep(100);
 	}
 }
@@ -33,15 +43,17 @@ void	ft_sleep(t_var *var, int id, long lastmeal)
 
 void	ft_dropfork(t_var *var, int id)
 {
+	int	x;
 
+	x = id % var->nf;
 	if (var->philo[id - 1].leftfork)
 	{
-		if (!var->philo[id % var->nf].rightfork && !var->philo[id % var->nf].leftfork)
+		if (!var->philo[x].rightfork && !var->philo[x].leftfork)
 		{
-			var->philo[id % var->nf].rightfork = 1;
+			var->philo[x].rightfork = 1;
 			var->philo[id - 1].leftfork = 0;
 		}
-		pthread_mutex_unlock(&var->fork[(id % var->nf)]);
+		pthread_mutex_unlock(&var->fork[x]);
 	}
 	pthread_mutex_unlock(&var->fork[id - 1]);
 }
@@ -56,4 +68,3 @@ long	ft_eat(t_var *var, int id)
 	ft_dropfork(var, id);
 	return (lastmeal);
 }
-

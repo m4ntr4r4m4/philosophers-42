@@ -6,24 +6,24 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:13:41 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/10/09 16:55:02 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/10/09 17:01:58 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-
-
 long	ft_takefork(t_var *var, int id)
 {
+	int	x;
 
+	x = id % var->nf;
 	pthread_mutex_lock(&var->fork[id - 1]);
 	if (var->philo[id - 1].rightfork)
 	{
-		pthread_mutex_lock(&var->fork[(id % var->nf)]);
-		if (var->philo[id % var->nf].rightfork && !var->philo[id % var->nf].leftfork)
+		pthread_mutex_lock(&var->fork[x]);
+		if (var->philo[x].rightfork && !var->philo[x].leftfork)
 		{
-			var->philo[id % var->nf].rightfork = 0;
+			var->philo[x].rightfork = 0;
 			var->philo[id - 1].leftfork = 1;
 		}
 	}
@@ -35,20 +35,19 @@ long	ft_takefork(t_var *var, int id)
 	return (FAILURE);
 }
 
-
 void	*ft_create(void *arg)
 {
 	t_var	*var;
-	int	id;
+	int		id;
 	long	lastmeal;
 
 	var = arg;
 	pthread_mutex_lock(&var->mutex);
-	id = var->i++ + 1;  
+	id = var->i++ + 1;
 	pthread_mutex_unlock(&var->mutex);
 	lastmeal = var->origin;
 	pthread_mutex_lock(&var->dead);
-	while(var->death)
+	while (var->death)
 	{
 		pthread_mutex_unlock(&var->dead);
 		check_starvation(var, lastmeal, id);
@@ -62,7 +61,6 @@ void	*ft_create(void *arg)
 	}
 	pthread_mutex_unlock(&var->dead);
 	return (0);
-
 }
 
 void	begin(t_var var)
@@ -83,7 +81,6 @@ void	begin(t_var var)
 	i = -1;
 	while (++i < var.nf)
 		pthread_join(var.philo[i].id, NULL);
-
 	free(var.philo);
 }
 
