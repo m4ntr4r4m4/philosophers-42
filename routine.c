@@ -5,72 +5,66 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/08 18:38:49 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/09/13 17:33:35 by ahammoud         ###   ########.fr       */
+/*   Created: 2022/10/09 15:45:30 by ahammoud          #+#    #+#             */
+/*   Updated: 2022/10/10 12:25:48 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+long	ft_time(void)
+{
+	struct timeval	start;
+
+	if (gettimeofday(&start, NULL))
+		return (0);
+	return ((start.tv_sec * 1000000) + (start.tv_usec));
+}
+
+void	ft_time_sleep(int time)
+{
+	long	now;
+
+	now = ft_time();
+	while (true)
+	{
+		if (ft_time() - now >= time)
+			break ;
+		usleep(100);
+	}
+}
+
+void	ft_sleep(t_var *var, int id)
+{
+	ft_print(var, id, 4);
+	ft_time_sleep(var->teat);
+	ft_print(var, id, 5);
+}
+
+void	ft_dropfork(t_var *var, int id)
+{
+	int	x;
+
+	x = id % var->nf;
+	if (var->philo[id - 1].leftfork)
+	{
+		if (!var->philo[x].rightfork && !var->philo[x].leftfork)
+		{
+			var->philo[x].rightfork = 1;
+			var->philo[id - 1].leftfork = 0;
+		}
+		pthread_mutex_unlock(&var->fork[x]);
+	}
+	pthread_mutex_unlock(&var->fork[id - 1]);
+}
+
 long	ft_eat(t_var *var, int id)
 {
 	long	lastmeal;
 
-	pthread_mutex_lock(&var->rfork);
-	ft_print(var, id, 3);
-	usleep(var->teat);
 	lastmeal = ft_time();
-	if (!var->philo[id % var->nf].rightfork)
-	{
-		var->philo[id % var->nf].rightfork = 1;
-		if (var->philo[id - 1].leftfork)
-			var->philo[id - 1].leftfork = 0;
-	}
-	pthread_mutex_unlock(&var->rfork);
+	ft_print(var, id, 3);
+	ft_time_sleep(var->teat);
+	ft_dropfork(var, id);
 	return (lastmeal);
-}
-
-long	ft_takefork(t_var *var, int id, bool *e)
-{
-	long	lastmeal;
-
-	lastmeal = 0;
-	pthread_mutex_lock(&var->rfork);
-	if (var->philo[id - 1].rightfork && \
-			var->philo[id % var->nf].rightfork \
-			&& !var->philo[id % var->nf].leftfork)
-	{
-		ft_print(var, id, 2);
-		var->philo[id % var->nf].rightfork = 0;
-		if (!var->philo[id - 1].leftfork && var->philo[id - 1].rightfork)
-		{
-			var->philo[id - 1].leftfork = 1;
-			ft_print(var, id, 2);
-		}
-		if (var->philo[id - 1].rightfork && var->philo[id - 1].leftfork)
-		{
-			pthread_mutex_unlock(&var->rfork);
-			lastmeal = ft_eat(var, id);
-			*e = true;
-		}
-	}
-	else
-		pthread_mutex_unlock(&var->rfork);
-	return (lastmeal);
-}
-
-void	ft_sleep(t_var *var, int id, bool *e)
-{
-	bool	slept;
-
-	slept = false;
-	if (*e)
-	{
-		ft_print(var, id, 4);
-		*e = true;
-		usleep(var->tsleep);
-		slept = true;
-	}
-	if (slept)
-		ft_print(var, id, 5);
 }

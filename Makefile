@@ -6,11 +6,11 @@
 #    By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/07 13:14:42 by ahammoud          #+#    #+#              #
-#    Updated: 2022/09/13 17:39:24 by ahammoud         ###   ########.fr        #
+#    Updated: 2022/10/10 12:36:35 by ahammoud         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS	=	./philo.c ./ft_atoi.c ./utils.c ./routine.c
+SRCS	=	./philo.c ./errors.c ./ft_atoi.c ./utils.c ./routine.c
 
 OBJS	=	${SRCS:.c=.o}
 
@@ -19,10 +19,10 @@ OBJS	=	${SRCS:.c=.o}
 
 NAME	=	 philo
 
-CFLAGS	=	-Wall   -pthread -g -fsanitize=thread
+CFLAGS	=	-Wall -Werror -Wextra   -pthread
 
 
-CC	=	clang
+CC	=	gcc
 
 
 ${NAME}	:	${OBJS} 
