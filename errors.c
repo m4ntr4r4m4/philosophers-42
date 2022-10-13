@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/09 17:23:13 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/10/09 17:26:19 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/10/13 16:43:54 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "philo.h"
@@ -40,4 +40,15 @@ void	check_starvation(t_var *var, long lastmeal, int id)
 	tdeath = ft_time();
 	if ((tdeath - lastmeal) / 1000 > var->td / 1000)
 		ft_print(var, id, 1);
+}
+
+void	ft_free(t_var *var)
+{
+	free(var->philo);
+	free(var->fork);
+}
+
+void	leaks(void)
+{
+	system("leaks -q philo\n");
 }

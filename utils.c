@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/09 17:10:06 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/10/13 12:13:33 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/10/13 16:39:34 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ void	ft_print_dead(t_var *var, int id, long now)
 	var->death = 0;
 	printf("%ld \033[1;31m philo %d died\n", (now - var->origin) / 1000, id);
 	pthread_mutex_unlock(&var->dead);
+	ft_free(var);
 	exit(0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:14:10 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/10/10 12:26:05 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/10/13 16:44:55 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,8 @@ typedef struct s_var{
 	t_philo				*philo;
 }	t_var;
 
+void	leaks(void);
+void	ft_free(t_var *var);
 void	ft_philo_init(t_var *var);
 long	ft_time(void);
 void	ft_print(t_var *var, int id, int i);

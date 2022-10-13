@@ -6,7 +6,7 @@
 /*   By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/08 19:13:41 by ahammoud          #+#    #+#             */
-/*   Updated: 2022/10/10 14:06:34 by ahammoud         ###   ########.fr       */
+/*   Updated: 2022/10/13 16:44:20 by ahammoud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,10 @@ int	ft_id(t_var *var)
 	id = var->i++ + 1;
 	pthread_mutex_unlock(&var->mutex);
 	if (var->nf < 2)
+	{
+		usleep(var->td);
 		ft_print(var, id, 1);
+	}
 	return (id);
 }
 
@@ -94,13 +97,14 @@ void	begin(t_var var)
 	i = -1;
 	while (++i < var.nf)
 		pthread_join(var.philo[i].id, NULL);
-	free(var.philo);
+	ft_free(&var);
 }
 
 int	main(int ac, char **av)
 {
 	t_var	var;
 
+	atexit(leaks);
 	if (ac > 4 && ac <= 6)
 	{
 		if (!check_error(ac, av))
