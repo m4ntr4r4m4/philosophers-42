@@ -3,43 +3,37 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ahammoud <marvin@42.fr>                    +#+  +:+       +#+         #
+#    By: Auto Generated                                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/03/07 13:14:42 by ahammoud          #+#    #+#              #
-#    Updated: 2022/10/10 12:36:35 by ahammoud         ###   ########.fr        #
+#    Created: AUTO                                    #+#    #+#              #
+#    Updated: AUTO                                    ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 TMPDIR := $(CURDIR)
 export TMPDIR
-SRCS	=	./philo.c ./errors.c ./ft_atoi.c ./utils.c ./routine.c
+SRCS = philo_bonus.c ft_atoi.c routine_bonus.c process_bonus.c actions_bonus.c
+OBJS = $(SRCS:.c=.o)
 
-OBJS	=	${SRCS:.c=.o}
+NAME = philo_bonus
 
-.c.o	:
-			${CC} ${CFLAGS} -c $< -o ${<:.c=.o} -I includes/
+CC = gcc
+CFLAGS = -Wall -Wextra -Werror -pthread
 
-NAME	=	 philo
+all: $(NAME)
 
-CFLAGS	=	-Wall -Werror -Wextra   -pthread
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
+$(NAME): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
-CC	=	gcc
+clean:
+	rm -f $(OBJS)
 
+fclean: clean
+	rm -f $(NAME)
 
-${NAME}	:	${OBJS} 
-			${CC} ${CFLAGS}  ${OBJS}  -o ${NAME}
+re: fclean all
 
-all	:	${NAME}
-
-RM	=	rm -f
-
-clean	:
-		${RM} ${OBJS}
-
-fclean	:	clean
-			${RM} ${NAME}
-
-re		:	fclean all
-
-.PHONY	:	all clean fclean re
+.PHONY: all clean fclean re
